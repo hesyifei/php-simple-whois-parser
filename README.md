@@ -3,7 +3,8 @@ This is an simple whois data parser in PHP.
 
 # Example Usage
 
-```
+```php
+<?php
 require_once 'whois.php';
 $whoisClass = new Whois;
 
@@ -18,8 +19,9 @@ if(!is_array($whoisResult)){
 }else{
 	print_r($whoisResult);
 }
+?>
 ```
 
 Another example can be found in `example.php`.
 
-# By AREFLY.COM
+## By AREFLY.COM
