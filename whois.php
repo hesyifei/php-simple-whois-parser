@@ -476,16 +476,16 @@ class Whois{
 			[ 'id'			=> ['ID'] ],
 			[ 'name'		=> ['Name'] ],
 			[ 'organization'	=> ['Organization'] ],
-			[ 'address'		=> ['Street', 'Address', 'Address2', 'Address3'] ],
 			[ 'city'		=> ['City'] ],
+			[ 'country'		=> ['Country', 'Country/Economy'] ],
+			[ 'address'		=> ['Street', 'Address', 'Address2', 'Address3'] ],
 			[ 'state_province'	=> ['State/Province'] ],
 			[ 'postal_code'		=> ['Postal Code'] ],
-			[ 'country'		=> ['Country', 'Country/Economy'] ],
+			[ 'email'		=> ['Email'] ],
 			[ 'phone'		=> ['Phone'] ],
 			[ 'phone_ext'		=> ['Phone Ext', 'Phone Ext.'] ],
 			[ 'fax'			=> ['Fax', 'FAX'] ],
-			[ 'fax_ext'		=> ['Fax Ext', 'FAX Ext.'] ],
-			[ 'email'		=> ['Email'] ]
+			[ 'fax_ext'		=> ['Fax Ext', 'FAX Ext.'] ]
 		];
 
 		$contactInfoKeywords = [
@@ -514,17 +514,7 @@ class Whois{
 		}else{
 			$domainWord = $domainWords['def'];
 		}
-
-		/*$keywords = [	'Domain Name'		=> 'domain',
-						'Name Server'		=> 'dns',
-						'Registrar'			=> 'registrar',
-						'Whois Server'		=> 'whois_server',
-						'Creation Date'		=> 'created',
-						'Updated Date'		=> 'updated',
-						'Registrar Registration Expiration Date' => 'expires',
-						'Expiration Date'	=> 'expires',
-						'Status'			=> 'status' 
-					];*/
+		
 		$data = array_filter(array_map("Whois::ifWhiteSpace", $data));
 		//print_r($data);
 		$parseResult = $this->parse($data, $domain, $domainWord, $toBeParseKeywords, true);
@@ -607,22 +597,29 @@ class Whois{
 			}
 		}
 
+		$needToAddCompletelyAddressArrays = ['registrant', 'admin', 'tech', 'billing'];
+		foreach($needToAddCompletelyAddressArrays as $needToAddCompletelyAddressArray){
+			if(!empty($parseResult[$needToAddCompletelyAddressArray])){
+				$parseResult[$needToAddCompletelyAddressArray]["completely_address"] = implode(", ", $parseResult[$needToAddCompletelyAddressArray]["address"]);
+				/* WILL CITY & COUNTRY WILL BE INCLUDE IN FULL ADDRESS? */
+				/*$allExtraInfomations = ["city", "country"];
+				foreach($allExtraInfomations as $extraInfomation){
+					if(!empty($parseResult[$needToAddCompletelyAddressArray][$extraInfomation])){
+						$parseResult[$needToAddCompletelyAddressArray]["completely_address"] .= ", ".$parseResult[$needToAddCompletelyAddressArray][$extraInfomation];
+					}
+				}*/
+				$parseResult[$needToAddCompletelyAddressArray]["completely_address"] = ucwords(strtolower($parseResult[$needToAddCompletelyAddressArray]["completely_address"]));
+			}
+		}
+
 		if(empty($parseResult)){
 			return ["++[ERROR_NOTHING_IN_ARRAY]++"];
 		}
-
-		
-		//ksort($parseResult);
 
 		return $parseResult;
 	}
 
 	private function ifWhiteSpace($el){
-		/*var_dump(empty($el));
-		if ( ($el == "") || ($el == " ") || (empty($el)) ) {
-			return "%";
-		} else {*/
 		return trim($el, " ");
-		//}
 	}
 }
