@@ -271,6 +271,10 @@ class Whois{
 	public function query($domain, $type = 'array', $raw = false){
 		$domain = strip_tags($domain);
 
+		$explodedDomain = explode(".", $domain);
+		$explodedCount = count($explodedDomain);
+		$domain = $explodedDomain[$explodedCount-2].".".$explodedDomain[$explodedCount-1];
+
 		$tld = substr($domain, strrpos($domain, '.') + 1);
 
 		$data = [];
@@ -286,8 +290,7 @@ class Whois{
 			if(!empty($whoisServerFromWhois['whois_server'][0])){
 				$data = $this->getWhoisResult($domain, $tld, $whoisServerFromWhois['whois_server'][0]);
 			}
-			//print_r($data);
-
+			
 			$parsedResult = $this->parse_domain($data, $domain, $tld);
 
 			if(!empty($parsedResult[0])){
@@ -308,12 +311,10 @@ class Whois{
 		if (empty($domain)) {
 			return ["++[ERROR_NOTHING_ENTERED]++"];
 		}
-		/*if (empty($tld)) {
-			return ["++[ERROR_NO_TLD]++"];
-		}*/
 		if(strpos($domain, ".") == false){
 			return ["++[ERROR_NOT_A_DOMAIN]++"];
 		}
+
 		if (!array_key_exists($tld, $this->whoisServers)){
 			return ["++[ERROR_UNSUPPORTED_TLD]++"];
 		}
