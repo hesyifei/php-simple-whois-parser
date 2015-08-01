@@ -273,6 +273,9 @@ class Whois{
 
 		$explodedDomain = explode(".", $domain);
 		$explodedCount = count($explodedDomain);
+		if(empty($explodedDomain[$explodedCount-1])){
+			return "++[ERROR_NOT_A_DOMAIN]++";
+		}
 		$domain = $explodedDomain[$explodedCount-2].".".$explodedDomain[$explodedCount-1];
 
 		$tld = substr($domain, strrpos($domain, '.') + 1);
@@ -344,8 +347,8 @@ class Whois{
 		while (!feof($f)){
 			$data[] = rtrim(fgets($f), "\n");
 		}
-
-		$stringsExistToMeanAvailable = ["No match for", "Status: AVAILABLE", "NOT FOUND", "No Found", "No information available about domain name", "No matching record.", "No entries found in the AFNIC Database.", "The domain has not been registered.", "Status: free"];
+		
+		$stringsExistToMeanAvailable = ["No Match", "No match for", "Status: AVAILABLE", "NOT FOUND", "No Found", "No information available about domain name", "No matching record.", "No entries found in the AFNIC Database.", "The domain has not been registered.", "Status: free"];
 
 		foreach($stringsExistToMeanAvailable as $stringExistToMeanAvailable){
 			foreach($data as $eachLine){
@@ -601,20 +604,24 @@ class Whois{
 		$needToAddCompletelyAddressArrays = ['registrant', 'admin', 'tech', 'billing'];
 		foreach($needToAddCompletelyAddressArrays as $needToAddCompletelyAddressArray){
 			if(!empty($parseResult[$needToAddCompletelyAddressArray])){
-				$parseResult[$needToAddCompletelyAddressArray]["completely_address"] = implode(", ", $parseResult[$needToAddCompletelyAddressArray]["address"]);
-				/* WILL CITY & COUNTRY WILL BE INCLUDE IN FULL ADDRESS? */
-				/*$allExtraInfomations = ["city", "country"];
-				foreach($allExtraInfomations as $extraInfomation){
-					if(!empty($parseResult[$needToAddCompletelyAddressArray][$extraInfomation])){
-						$parseResult[$needToAddCompletelyAddressArray]["completely_address"] .= ", ".$parseResult[$needToAddCompletelyAddressArray][$extraInfomation];
-					}
-				}*/
-				$parseResult[$needToAddCompletelyAddressArray]["completely_address"] = ucwords(strtolower($parseResult[$needToAddCompletelyAddressArray]["completely_address"]));
+				if(!empty($parseResult[$needToAddCompletelyAddressArray]["address"])){
+					$parseResult[$needToAddCompletelyAddressArray]["completely_address"] = implode(", ", $parseResult[$needToAddCompletelyAddressArray]["address"]);
+					/* WILL CITY & COUNTRY WILL BE INCLUDE IN FULL ADDRESS? */
+					/*$allExtraInfomations = ["city", "country"];
+					foreach($allExtraInfomations as $extraInfomation){
+						if(!empty($parseResult[$needToAddCompletelyAddressArray][$extraInfomation])){
+							$parseResult[$needToAddCompletelyAddressArray]["completely_address"] .= ", ".$parseResult[$needToAddCompletelyAddressArray][$extraInfomation];
+						}
+					}*/
+					$parseResult[$needToAddCompletelyAddressArray]["completely_address"] = ucwords(strtolower($parseResult[$needToAddCompletelyAddressArray]["completely_address"]));
+				}
 			}
 		}
 
-		if(empty($parseResult)){
-			return ["++[ERROR_NOTHING_IN_ARRAY]++"];
+		if($_GET['type'] != "text"){
+			if(empty($parseResult)){
+				return ["++[ERROR_NOTHING_IN_ARRAY]++"];
+			}
 		}
 
 		return $parseResult;
