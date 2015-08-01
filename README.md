@@ -8,7 +8,7 @@ An simple whois data parser in PHP.
 require_once 'whois.php';
 $whoisClass = new Whois;
 
-$domain = "hello.com";
+$domain = "github.com";
 
 $whoisResult = $whoisClass->query($domain);
 
@@ -70,9 +70,9 @@ Array
 
     [dns] => Array
         (
-            [0] => ns3.p16.dynect.net
+            [0] => ns1.p16.dynect.net
             [1] => ns2.p16.dynect.net
-            [2] => ns1.p16.dynect.net
+            [2] => ns3.p16.dynect.net
             [3] => ns4.p16.dynect.net
         )
 
@@ -169,6 +169,7 @@ Array
             [country] => US
             [phone] => +1.4157354488
             [email] => hostmaster@github.com
+            [completely_address] => 88 Colin P Kelly Jr St,
         )
 
     [admin] => Array
@@ -186,6 +187,7 @@ Array
             [country] => US
             [phone] => +1.4157354488
             [email] => hostmaster@github.com
+            [completely_address] => 88 Colin P Kelly Jr St,
         )
 
     [tech] => Array
@@ -203,6 +205,7 @@ Array
             [country] => US
             [phone] => +1.4157354488
             [email] => hostmaster@github.com
+            [completely_address] => 88 Colin P Kelly Jr St,
         )
 
 )
