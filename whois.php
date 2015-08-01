@@ -348,7 +348,7 @@ class Whois{
 			$data[] = rtrim(fgets($f), "\n");
 		}
 		
-		$stringsExistToMeanAvailable = ["No Match", "No match for", "Status: AVAILABLE", "NOT FOUND", "No Found", "No information available about domain name", "No matching record.", "No entries found in the AFNIC Database.", "The domain has not been registered.", "Status: free"];
+		$stringsExistToMeanAvailable = ["No Match", "No match for", "Status: AVAILABLE", "NOT FOUND", "Not found", "No Found", "No information available about domain name", "No matching record.", "No entries found in the AFNIC Database.", "The domain has not been registered.", "Status: free"];
 
 		foreach($stringsExistToMeanAvailable as $stringExistToMeanAvailable){
 			foreach($data as $eachLine){
@@ -453,10 +453,10 @@ class Whois{
 
 		$domainsKeywords = [
 			[ 'id'			=> ['Domain ID', 'Domain Name ID', 'Registry Domain ID'] ],
-			[ 'domain'		=> ['Domain Name', 'DOMAIN NAME', 'Domain', 'domain'] ],
+			[ 'domain'		=> ['Domain name', 'Domain Name', 'DOMAIN NAME', 'Domain', 'domain'] ],
 			[ 'bundled_domain'		=> ['Bundled Domain Name'] ],
 			[ 'dns'			=> ['Name Server', 'Nameservers', 'Name servers', 'Name Servers Information', 'Domain servers in listed order', 'nserver', 'nameservers'] ],
-			[ 'registrar'	=> ['Registrar', 'registrar', 'Registrant', 'Registrar Name'] ],
+			[ 'registrar'	=> ['Registrar', 'registrar', 'Registrant', 'Registrar Name', 'Created by Registrar'] ],
 			[ 'registrar_url'	=> ['Registrar URL', 'Registrar URL (registration services)'] ],
 			[ 'sponsoring_registrar'	=> [ 'Sponsoring Registrar'] ],
 			[ 'whois_server'	=> ['Whois Server', 'WHOIS SERVER', 'Registrar WHOIS Server'] ],
@@ -482,13 +482,13 @@ class Whois{
 			[ 'organization'	=> ['Organization'] ],
 			[ 'city'		=> ['City'] ],
 			[ 'country'		=> ['Country', 'Country/Economy'] ],
-			[ 'address'		=> ['Street', 'Address', 'Address2', 'Address3'] ],
+			[ 'address'		=> ['Street', 'Address', 'Address1', 'Address2', 'Address3', 'Address4'] ],
 			[ 'state_province'	=> ['State/Province'] ],
 			[ 'postal_code'		=> ['Postal Code'] ],
 			[ 'email'		=> ['Email'] ],
-			[ 'phone'		=> ['Phone'] ],
+			[ 'phone'		=> ['Phone', 'Phone Number'] ],
 			[ 'phone_ext'		=> ['Phone Ext', 'Phone Ext.'] ],
-			[ 'fax'			=> ['Fax', 'FAX'] ],
+			[ 'fax'			=> ['Fax', 'FAX', 'Facsimile Number'] ],
 			[ 'fax_ext'		=> ['Fax Ext', 'FAX Ext.'] ]
 		];
 
