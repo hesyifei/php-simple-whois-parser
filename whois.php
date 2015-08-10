@@ -276,14 +276,25 @@ class Whois{
 		if(empty($explodedDomain[$explodedCount-1])){
 			return "++[ERROR_NOT_A_DOMAIN]++";
 		}
-		$domain = $explodedDomain[$explodedCount-2].".".$explodedDomain[$explodedCount-1];
+
+		$domainArr = array_slice($explodedDomain, -2);
+		$domain = implode(".", $domainArr);
+		//$domain = $explodedDomain[$explodedCount-2].".".$explodedDomain[$explodedCount-1];
+
+		if(array_key_exists($explodedDomain[$explodedCount-1], $this->whoisServers)){
+			if(array_key_exists($explodedDomain[$explodedCount-2], $this->whoisServers)){
+				//$domain = $explodedDomain[$explodedCount-3].".".$explodedDomain[$explodedCount-2].".".$explodedDomain[$explodedCount-1];
+				$domainArr = array_slice($explodedDomain, -3);
+				$domain = implode(".", $domainArr);
+			}
+		}
 
 		$tld = substr($domain, strrpos($domain, '.') + 1);
 
+		//$this->returnType = $type
+
 		$data = [];
-				
-		//echo $whoisServers[$tld];
-		
+
 		$data = $this->getWhoisResult($domain, $tld);
 
 		if(mb_substr($data[0], 0, 3) == "++["){
@@ -327,8 +338,6 @@ class Whois{
 		}
 		$f = fsockopen($serverUrl, 43);
 		
-		//if ($tld == 'com')
-		//{
 		$needToBeAddEqual = ["whois.verisign-grs.com", "whois.verisign-grs.net"];
 
 		if (in_array($serverUrl, $needToBeAddEqual)){
@@ -348,15 +357,35 @@ class Whois{
 			$data[] = rtrim(fgets($f), "\n");
 		}
 		
-		$stringsExistToMeanAvailable = ["No Match", "No match for", "Status: AVAILABLE", "NOT FOUND", "Not found", "No Found", "No information available about domain name", "No matching record.", "No entries found in the AFNIC Database.", "The domain has not been registered.", "Status: free"];
+		if($_GET['type'] != "text"){
+			$stringsExistToMeanAvailable = ["No Match", "No match for", "Status: AVAILABLE", "NOT FOUND", "Not found", "No Found", "No information available about domain name", "No matching record.", "No entries found in the AFNIC Database.", "The domain has not been registered.", "Status: free"];
+			$stringsExistToMeanErrorInput = ["Incorrect input, please try again.", "Error for \""];
+			$stringsExistToMeanWaitSomeTime = ["Please maintain at least " => "Please maintain at least %d-second time before starting another enquiry."];
 
-		foreach($stringsExistToMeanAvailable as $stringExistToMeanAvailable){
 			foreach($data as $eachLine){
-				if(strpos($eachLine, $stringExistToMeanAvailable) !== false){
-					return ["++[ERROR_NO_MATCH]++"];
+				foreach($stringsExistToMeanAvailable as $stringExistToMeanAvailable){
+					if(strpos($eachLine, $stringExistToMeanAvailable) !== false){
+						return ["++[ERROR_NO_MATCH]++"];
+					}
 				}
-				if(strpos($eachLine, "Incorrect input, please try again.") !== false){
-					return ["++[ERROR_INPUT]++"];
+				foreach($stringsExistToMeanErrorInput as $stringExistToMeanErrorInput){
+					if(strpos($eachLine, $stringExistToMeanErrorInput) !== false){
+						return ["++[ERROR_INPUT]++"];
+					}
+				}
+				foreach($stringsExistToMeanWaitSomeTime as $stringExistToMeanWaitSomeTime => $sscanfFullString){
+					if(strpos($eachLine, $stringExistToMeanWaitSomeTime) !== false){
+						if($sscanfFullString == "N/A"){
+							return ["++[PLZ_WAIT_SOME_TIME]++"];
+						}else{
+							sscanf($eachLine, $sscanfFullString, $second);
+							if(!empty($second)){
+								return ["++[PLZ_WAIT_".$second."_SEC]++"];
+							}else{
+								return ["++[PLZ_WAIT_SOME_TIME]++"];
+							}
+						}
+					}
 				}
 			}
 		}
