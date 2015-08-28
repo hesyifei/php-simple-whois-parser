@@ -268,7 +268,12 @@ class Whois{
 	"yu" => "whois.ripe.net"];
 	//"中文" => "whois.afilias-srs.net"];
 
+	private $returnType = "";
+
 	public function query($domain, $type = 'array', $raw = false){
+		
+		$this->returnType = $type;
+
 		$domain = strip_tags($domain);
 
 		$explodedDomain = explode(".", $domain);
@@ -281,17 +286,17 @@ class Whois{
 		$domain = implode(".", $domainArr);
 		//$domain = $explodedDomain[$explodedCount-2].".".$explodedDomain[$explodedCount-1];
 
-		if(array_key_exists($explodedDomain[$explodedCount-1], $this->whoisServers)){
-			if(array_key_exists($explodedDomain[$explodedCount-2], $this->whoisServers)){
-				//$domain = $explodedDomain[$explodedCount-3].".".$explodedDomain[$explodedCount-2].".".$explodedDomain[$explodedCount-1];
-				$domainArr = array_slice($explodedDomain, -3);
-				$domain = implode(".", $domainArr);
+		if($explodedCount >= 3){
+			if(array_key_exists($explodedDomain[$explodedCount-1], $this->whoisServers)){
+				if(array_key_exists($explodedDomain[$explodedCount-2], $this->whoisServers)){
+					//$domain = $explodedDomain[$explodedCount-3].".".$explodedDomain[$explodedCount-2].".".$explodedDomain[$explodedCount-1];
+					$domainArr = array_slice($explodedDomain, -3);
+					$domain = implode(".", $domainArr);
+				}
 			}
 		}
 
 		$tld = substr($domain, strrpos($domain, '.') + 1);
-
-		//$this->returnType = $type
 
 		$data = [];
 
@@ -312,7 +317,7 @@ class Whois{
 					return $parsedResult[0];
 				}
 			}else{
-				if($type == "text"){
+				if($this->returnType == "text"){
 					return trim(implode("\n", $data));
 				}else{
 					return $parsedResult;
@@ -357,8 +362,8 @@ class Whois{
 			$data[] = rtrim(fgets($f), "\n");
 		}
 		
-		if($_GET['type'] != "text"){
-			$stringsExistToMeanAvailable = ["No Match", "No match for", "Status: AVAILABLE", "NOT FOUND", "Not found", "No Found", "No information available about domain name", "No matching record.", "No entries found in the AFNIC Database.", "The domain has not been registered.", "Status: free"];
+		if($this->returnType != "text"){
+			$stringsExistToMeanAvailable = ["No Match", "No match", "No match for", "Status: AVAILABLE", "NOT FOUND", "Not found", "No Found", "No information available about domain name", "No matching record.", "No entries found in the AFNIC Database.", "The domain has not been registered.", "Status: free"];
 			$stringsExistToMeanErrorInput = ["Incorrect input, please try again.", "Error for \""];
 			$stringsExistToMeanWaitSomeTime = ["Please maintain at least " => "Please maintain at least %d-second time before starting another enquiry."];
 
@@ -481,7 +486,7 @@ class Whois{
 		];
 
 		$domainsKeywords = [
-			[ 'id'			=> ['Domain ID', 'Domain Name ID', 'Registry Domain ID'] ],
+			[ 'id'			=> ['Domain ID', 'Domain Name ID', 'Registry Domain ID', 'ROID'] ],
 			[ 'domain'		=> ['Domain name', 'Domain Name', 'DOMAIN NAME', 'Domain', 'domain'] ],
 			[ 'bundled_domain'		=> ['Bundled Domain Name'] ],
 			[ 'dns'			=> ['Name Server', 'Nameservers', 'Name servers', 'Name Servers Information', 'Domain servers in listed order', 'nserver', 'nameservers'] ],
@@ -647,7 +652,7 @@ class Whois{
 			}
 		}
 
-		if($_GET['type'] != "text"){
+		if($this->returnType != "text"){
 			if(empty($parseResult)){
 				return ["++[ERROR_NOTHING_IN_ARRAY]++"];
 			}
