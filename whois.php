@@ -358,7 +358,7 @@ class Whois{
 
 		$data = [];
 
-		while (!feof($f)){
+		while ($f !== false && !feof($f)){
 			$data[] = rtrim(fgets($f), "\n");
 		}
 		
